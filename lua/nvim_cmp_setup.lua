@@ -3,6 +3,7 @@ vim.opt.completeopt = { 'menu', 'menuone', 'noselect' }
 require('luasnip.loaders.from_vscode').lazy_load()
 local cmp = require('cmp')
 local luasnip = require('luasnip')
+
 local lspkind = require("lspkind")
 
 cmp.setup({
@@ -14,17 +15,30 @@ cmp.setup({
 	sources = {
 		{ name = 'nvim_lsp', keyword_length = 2 },
 		{ name = 'luasnip', keyword_length = 2 },
+		{ name = 'crates' },
 		{ name = 'buffer', keyword_length = 3 },
 		{ name = 'path', keyword_length = 2 },
 	},
 
-	format = lspkind.cmp_format({
-		mode = 'symbol_text',
-		maxwidth = 50, -- prevent the popup from showing more than provided characters (e.g 50 will not show more than 50 characters)
-		ellipsis_char = '...', -- when popup menu exceed maxwidth, the truncated part would show ellipsis_char instead (must define maxwidth first)
-
-	}
-	),
+	formatting = {
+		format = lspkind.cmp_format({
+			mode = 'symbol_text',
+			maxwidth = 50, -- prevent the popup from showing more than provided characters (e.g 50 will not show more than 50 characters)
+			ellipsis_char = '...', -- when popup menu exceed maxwidth, the truncated part would show ellipsis_char instead (must define maxwidth first)
+			before = function(entry, vim_item)
+				-- Source
+				vim_item.menu = ({
+					buffer = "[Buf]",
+					nvim_lsp = "[LSP]",
+					luasnip = "[LuaSnip]",
+					path = "[Path]",
+					crates = "[Crates.io]"
+				})[entry.source.name]
+				return vim_item
+			end,
+		}
+		),
+	},
 	mapping = {
 		['<Up>'] = cmp.mapping.select_prev_item(),
 		['<Down>'] = cmp.mapping.select_next_item(),
@@ -74,3 +88,4 @@ cmp.event:on(
 	'confirm_done',
 	cmp_autopairs.on_confirm_done()
 )
+

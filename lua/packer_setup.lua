@@ -24,13 +24,14 @@ return require("packer").startup({
 		use "hrsh7th/cmp-buffer"
 		use "hrsh7th/cmp-path"
 		use "hrsh7th/cmp-cmdline"
-		-- complete engine
-		use "hrsh7th/nvim-cmp"
 		-- for snip template and expand snip
 		use "L3MON4D3/LuaSnip"
 		use "rafamadriz/friendly-snippets"
 		-- better icon
 		use "onsails/lspkind.nvim"
+
+		-- complete engine
+		use "hrsh7th/nvim-cmp"
 		use {
 			"kyazdani42/nvim-tree.lua",
 			requires = "kyazdani42/nvim-web-devicons",
@@ -126,6 +127,16 @@ return require("packer").startup({
 			'nvim-telescope/telescope.nvim',
 			requires = { { 'nvim-lua/plenary.nvim' } }
 		}
+
+		use {
+			'saecki/crates.nvim',
+			tag = 'v0.3.0',
+			requires = { 'nvim-lua/plenary.nvim' },
+			config = function()
+				require('crates').setup()
+			end,
+		}
+
 
 		if packer_bootstrap then
 			require("packer").sync()
