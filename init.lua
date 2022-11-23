@@ -1,0 +1,6 @@
+require("packer_setup")
+require("lsp_setup")
+require("nvim_cmp_setup")
+require("nvim_options")
+require("telescope_setup")
+require("lualine_setup")
