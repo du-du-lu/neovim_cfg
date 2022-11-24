@@ -32,7 +32,7 @@ cmp.setup({
 					nvim_lsp = "[LSP]",
 					luasnip = "[LuaSnip]",
 					path = "[Path]",
-					crates = "[Crates.io]"
+					crates = "[Crates]"
 				})[entry.source.name]
 				return vim_item
 			end,

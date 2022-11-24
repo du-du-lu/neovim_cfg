@@ -137,6 +137,10 @@ return require("packer").startup({
 			end,
 		}
 
+		use {
+			'WhoIsSethDaniel/lualine-lsp-progress.nvim'
+		}
+
 
 		if packer_bootstrap then
 			require("packer").sync()
