@@ -64,9 +64,6 @@ vim.api.nvim_create_autocmd('LspAttach', {
 
 		-- Move to the next diagnostic
 		bufmap('n', ']d', vim.diagnostic.goto_next)
-
-		vim.api.nvim_create_autocmd({ 'BufEnter', 'CursorHold', 'InsertLeave' }, { callback = vim.lsp.codelens.refresh })
-
 	end
 })
 
@@ -80,8 +77,66 @@ lsp_defaults.capabilities = vim.tbl_deep_extend(
 	require('cmp_nvim_lsp').default_capabilities()
 )
 
+local function rust_on_attach()
+	local bufmap = function(mode, lhs, rhs)
+		local opts = { buffer = true }
+		vim.keymap.set(mode, lhs, rhs, opts)
+	end
+	vim.api.nvim_create_autocmd({ 'BufEnter', 'CursorHold', 'InsertLeave' }, { callback = vim.lsp.codelens.refresh })
+	bufmap('n', '<Leader>c', vim.lsp.codelens.run)
+	vim.lsp.codelens.refresh()
+	local function generate_cargo_command(command_args)
+		local args = command_args.arguments[1].args
+		local command = { 'cargo' }
+		vim.list_extend(command, args.cargoArgs)
+		table.insert(command, '--manifest-path')
+		table.insert(command, args.workspaceRoot .. '/Cargo.toml')
+		table.insert(command, '--')
+		vim.list_extend(command, args.executableArgs)
+		return command
+	end
+
+	local function close_terminal()
+		vim.api.nvim_buf_delete(0)
+		vim.api.nvim_win_close(0, 1)
+	end
+
+	local function run_in_terminal(command)
+		local width = vim.api.nvim_win_get_width(0)
+		local height = vim.api.nvim_win_get_height(0)
+		local buf_id = vim.api.nvim_create_buf(false, true)
+		vim.api.nvim_buf_set_option(buf_id, 'modifiable', false)
+		vim.keymap.set(buf_id, 'n', 'q', close_terminal,
+			{ noremap = true, silent = true, buffer = true })
+		vim.keymap.set(buf_id, 'n', '<Esc>', close_terminal,
+			{ noremap = true, silent = true, buffer = true })
+		local win_id = vim.api.nvim_open_win(buf_id, true,
+			{ relative = 'cursor', width = math.floor(0.8 * width), height = math.floor(0.5 * height), bufpos = { 1, 0 } })
+		vim.api.nvim_win_set_option(win_id, 'cursorcolumn', false)
+		vim.fn.termopen(command)
+	end
+
+	if vim.lsp.commands["rust-analyzer.runSingle"] == nil then
+		vim.lsp.commands["rust-analyzer.runSingle"] = function(command)
+			run_in_terminal(generate_cargo_command(command))
+		end
+	end
+end
+
 -- set rust lsp
 lspconfig.rust_analyzer.setup({
+	settings = {
+		["rust-analyzer"] = {
+			["lens"] = {
+				["debug"] = {
+					["enable"] = false
+				}
+			}
+
+
+		}
+	},
+	on_attach = rust_on_attach
 })
 
 -- set lua lsp
@@ -117,32 +172,3 @@ lspconfig.pyright.setup({})
 
 --set c/c++ lsp
 lspconfig.clangd.setup({})
-
-local function generate_cargo_command(command_args)
-	local args = command_args.arguments[1].args
-	local command = { 'cargo' }
-	vim.list_extend(command, args.cargoArgs)
-	table.insert(command, '--manifest-path')
-	table.insert(command, args.workspaceRoot .. '/Cargo.toml')
-	table.insert(command, '--')
-	vim.list_extend(command, args.executableArgs)
-	return command
-end
-
-local function run_in_terminal(command)
-	local width = vim.api.nvim_win_get_width(0)
-	local height = vim.api.nvim_win_get_height(0)
-	local buf_id = vim.api.nvim_create_buf(false, true)
-	vim.api.nvim_buf_set_option(buf_id, 'modifiable', false)
-	vim.api.nvim_buf_set_keymap(buf_id, 'n', 'q', '<cmd>lua vim.api.nvim_win_close(0,1)<cr>',
-		{ noremap = true, silent = true })
-	vim.api.nvim_buf_set_keymap(buf_id, 'n', '<Esc>', '<cmd>lua vim.api.nvim_win_close(0,1)<cr>',
-		{ noremap = true, silent = true })
-	vim.api.nvim_open_win(buf_id, true,
-		{ relative = 'cursor', width = math.floor(0.8 * width), height = math.floor(0.5 * height), bufpos = { 1, 0 } })
-	vim.fn.termopen(command)
-end
-
-vim.lsp.commands["rust-analyzer.runSingle"] = function(command)
-	run_in_terminal(generate_cargo_command(command))
-end
