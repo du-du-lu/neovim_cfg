@@ -96,9 +96,11 @@ local function rust_on_attach()
 		return command
 	end
 
-	local function close_terminal()
-		vim.api.nvim_buf_delete(0)
-		vim.api.nvim_win_close(0, 1)
+	local function close_terminal_fn(win_id, buf_id)
+		return function()
+			vim.api.nvim_win_close(win_id, 1)
+			vim.api.nvim_buf_delete(buf_id,{})
+		end
 	end
 
 	local function run_in_terminal(command)
@@ -106,12 +108,14 @@ local function rust_on_attach()
 		local height = vim.api.nvim_win_get_height(0)
 		local buf_id = vim.api.nvim_create_buf(false, true)
 		vim.api.nvim_buf_set_option(buf_id, 'modifiable', false)
-		vim.keymap.set(buf_id, 'n', 'q', close_terminal,
-			{ noremap = true, silent = true, buffer = true })
-		vim.keymap.set(buf_id, 'n', '<Esc>', close_terminal,
-			{ noremap = true, silent = true, buffer = true })
 		local win_id = vim.api.nvim_open_win(buf_id, true,
 			{ relative = 'cursor', width = math.floor(0.8 * width), height = math.floor(0.5 * height), bufpos = { 1, 0 } })
+		local close_terminal = close_terminal_fn(win_id, buf_id)
+
+		vim.keymap.set('n', 'q', close_terminal,
+			{ noremap = true, silent = true, buffer = buf_id})
+		vim.keymap.set('n', '<Esc>', close_terminal,
+			{ noremap = true, silent = true, buffer = buf_id })
 		vim.api.nvim_win_set_option(win_id, 'cursorcolumn', false)
 		vim.fn.termopen(command)
 	end
