@@ -176,3 +176,6 @@ lspconfig.pyright.setup({})
 
 --set c/c++ lsp
 lspconfig.clangd.setup({})
+
+--set json lsp
+lspconfig.jsonls.setup{}
