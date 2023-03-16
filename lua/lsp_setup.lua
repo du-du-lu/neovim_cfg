@@ -144,7 +144,7 @@ lspconfig.rust_analyzer.setup({
 })
 
 -- set lua lsp
-lspconfig.sumneko_lua.setup {
+lspconfig.lua_ls.setup {
 	settings = {
 		Lua = {
 			runtime = {
