@@ -82,7 +82,7 @@ local function rust_on_attach()
 		local opts = { buffer = true }
 		vim.keymap.set(mode, lhs, rhs, opts)
 	end
-	vim.api.nvim_create_autocmd({ 'BufEnter', 'CursorHold', 'InsertLeave' }, { callback = vim.lsp.codelens.refresh })
+	vim.api.nvim_create_autocmd({ 'CursorHold', 'InsertLeave' }, { callback = vim.lsp.codelens.refresh })
 	bufmap('n', '<Leader>c', vim.lsp.codelens.run)
 	vim.lsp.codelens.refresh()
 	local function generate_cargo_command(command_args)
@@ -99,7 +99,7 @@ local function rust_on_attach()
 	local function close_terminal_fn(win_id, buf_id)
 		return function()
 			vim.api.nvim_win_close(win_id, 1)
-			vim.api.nvim_buf_delete(buf_id,{})
+			vim.api.nvim_buf_delete(buf_id, {})
 		end
 	end
 
@@ -113,7 +113,7 @@ local function rust_on_attach()
 		local close_terminal = close_terminal_fn(win_id, buf_id)
 
 		vim.keymap.set('n', 'q', close_terminal,
-			{ noremap = true, silent = true, buffer = buf_id})
+			{ noremap = true, silent = true, buffer = buf_id })
 		vim.keymap.set('n', '<Esc>', close_terminal,
 			{ noremap = true, silent = true, buffer = buf_id })
 		vim.api.nvim_win_set_option(win_id, 'cursorcolumn', false)
