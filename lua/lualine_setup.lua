@@ -3,12 +3,20 @@ require("lualine").setup(
 	{
 		sections = {
 			lualine_c = {
-				{ navic.get_location, cond = navic.is_available }
+				{
+					function()
+						return navic.get_location()
+					end,
+					cond = function ()
+						return navic.is_available()
+					end
+				}
 			},
 			lualine_x = {
 				{
 					'lsp_progress',
-					spinner_symbols = { '🌑 ', '🌒 ', '🌓 ', '🌔 ', '🌕 ', '🌖 ', '🌗 ', '🌘 ' },
+					spinner_symbols = { '🌑 ', '🌒 ', '🌓 ', '🌔 ', '🌕 ', '🌖 ', '🌗 ',
+						'🌘 ' },
 				}
 			}
 		},
