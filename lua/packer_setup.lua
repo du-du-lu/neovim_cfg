@@ -42,7 +42,8 @@ return require("packer").startup({
 					}
 
 				}
-				vim.api.nvim_set_keymap('n', '<A-m>', ':NvimTreeToggle<CR>', { noremap = true, silent = true })
+				vim.api.nvim_set_keymap('n', '<A-m>', ':NvimTreeToggle<CR>',
+				{ noremap = true, silent = true })
 			end
 		}
 
@@ -69,9 +70,10 @@ return require("packer").startup({
 						end
 					}
 				})
-				vim.api.nvim_set_keymap('n', '<A-left>', ':BufferLineCyclePrev<CR>', { noremap = true, silent = true })
-				vim.api.nvim_set_keymap('n', '<A-right>', ':BufferLineCycleNext<CR>', { noremap = true, silent = true })
-
+				vim.api.nvim_set_keymap('n', '<A-left>', ':BufferLineCyclePrev<CR>',
+				{ noremap = true, silent = true })
+				vim.api.nvim_set_keymap('n', '<A-right>', ':BufferLineCycleNext<CR>',
+				{ noremap = true, silent = true })
 			end
 		}
 
@@ -88,7 +90,8 @@ return require("packer").startup({
 		-- auto pair () {} []
 		use {
 			"windwp/nvim-autopairs",
-			config = function() require("nvim-autopairs").setup {
+			config = function()
+				require("nvim-autopairs").setup {
 
 				}
 				local npairs = require("nvim-autopairs")
@@ -124,8 +127,13 @@ return require("packer").startup({
 		}
 
 		use {
-			'nvim-telescope/telescope.nvim',
-			requires = { { 'nvim-lua/plenary.nvim' } }
+			"nvim-telescope/telescope.nvim",
+			requires = {
+				{ "nvim-telescope/telescope-live-grep-args.nvim" },
+			},
+			config = function()
+				require("telescope").load_extension("live_grep_args")
+			end
 		}
 
 		use {
@@ -197,5 +205,4 @@ return require("packer").startup({
 			open_fn = require("packer.util").float,
 		}
 	}
-
 })
